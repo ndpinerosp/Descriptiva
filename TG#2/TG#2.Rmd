@@ -1,0 +1,39 @@
+---
+title: "TG#2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r }
+sisben <- read.csv("Base_de_Datos_Sisben_2017-Municipio_de_Medell_n.csv",
+                   encoding = "UTF-8")
+save(sisben, file = "sisben.RData")
+
+
+```
+
+
+```{r}
+load("sisben.RData")
+
+sisben2<- sisben
+
+cols<-c("ZONA","COMUNA","VEREDA","BARRIO","VIVIENDA","TELEFONO","PARED","PISO","ENERGIA",
+        "ALCANTA","GAS","BASURA","ACUEDUC","ESTRATO","ELIMBASURA","HOGAR","TENEVIV","USOSANI",
+        "USANITAR","SANITAR","DUCHA","AGUA","LLEGA","SUMINIS","PREPARAN","COCINA","COCINAN",
+        "ALUMBRA","USOTELE","NEVERA","LAVADORA","TVCOLOR","TVCABLE","CALENTA","HORNO","AIRE",
+        "COMPUTADOR","EQUIPO","MOTO","TRACTOR","AUTO1","BIERAICES","SEXO","EXTRANJERO",
+        "TIPODOC","PARENTES","ESTCIVIL","SERDOMES","PAGAPOR","DISCAPA","CARNET","EMBARAZA",
+        "ASISTE","TIPOESTA","NIVEL","ACTIVI","PERCIBE") 
+sisben2[cols] <- lapply(sisben2[cols], factor)
+sisben2$FECHANTO<- as.Date(sisben2$FECHANTO,"%d/%m/%Y")
+
+str(sisben2)
+summary(sisben2)
+
+```
+
