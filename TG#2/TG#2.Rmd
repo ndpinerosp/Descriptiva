@@ -28,11 +28,12 @@ cols<-c("ZONA","COMUNA","VEREDA","BARRIO","VIVIENDA","TELEFONO","PARED","PISO","
         "ALUMBRA","USOTELE","NEVERA","LAVADORA","TVCOLOR","TVCABLE","CALENTA","HORNO","AIRE",
         "COMPUTADOR","EQUIPO","MOTO","TRACTOR","AUTO1","BIERAICES","SEXO","EXTRANJERO",
         "TIPODOC","PARENTES","ESTCIVIL","SERDOMES","PAGAPOR","DISCAPA","CARNET","EMBARAZA",
-        "ASISTE","TIPOESTA","NIVEL","ACTIVI","PERCIBE") 
+        "ASISTE","TIPOESTA","NIVEL","ACTIVI","PERCIBE","FORMULARIO") 
 sisben2[cols] <- lapply(sisben2[cols], factor)
 sisben2$FECHANTO<- as.Date(sisben2$FECHANTO,"%d/%m/%Y")
-
+sisben2$INGRESOS<- as.numeric(sisben2$INGRESOS)
 str(sisben2)
+
 summary(sisben2)
 
 ```
