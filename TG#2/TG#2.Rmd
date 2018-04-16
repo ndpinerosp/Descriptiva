@@ -8,13 +8,20 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-```{r }
-sisben <- read.csv("Base_de_Datos_Sisben_2017-Municipio_de_Medell_n.csv",
-                   encoding = "UTF-8")
-save(sisben, file = "sisben.RData")
-
+```{r}
+library(ggplot2)
+library(dplyr)
 
 ```
+
+##categorizar variables
+
+##descripcion de variables
+mostrar un analisis de las variables es decir mostrar distribuciones,etc
+
+##graficas
+mostrar graficas de relaciones relevantes es decir mostrar graficas de "cantida de personas mayores de 18 años por comuna"
+ya que este analisis es interesante
 
 
 ```{r}
@@ -32,9 +39,34 @@ cols<-c("ZONA","COMUNA","VEREDA","BARRIO","VIVIENDA","TELEFONO","PARED","PISO","
 sisben2[cols] <- lapply(sisben2[cols], factor)
 sisben2$FECHANTO<- as.Date(sisben2$FECHANTO,"%d/%m/%Y")
 sisben2$INGRESOS<- as.numeric(sisben2$INGRESOS)
+sisben2$EDAD <- as.numeric(difftime(Sys.Date(), 
+                          sisben2$FECHANTO, 
+                          units = "days"))/365.25
 str(sisben2)
-
-summary(sisben2)
 
 ```
 
+##Variables Persona
+###Parientes 
+
+en este caso podemos averiguar cuantos parientes tiene una misma persona
+###Estado Civil
+
+Aca podemos notar cual es el estado mas comun de todos lo encuestados tomando en cuenta el siguiente orden
+Donde 1:Union libre 2:Casado 3:Viudo 4:Separado 5:Soltero
+```{r}
+s1 <- sisben2 %>%
+             arrange(desc(ESTCIVIL)) %>% 
+                       group_by(FORMULARIO,ESTCIVIL)
+head(subset(s1, select = c("ESTCIVIL","FORMULARIO")))
+#summary(sisben2$ESTCIVIL)
+#ggplot(sisben2,aes(ESTCIVIL,fill=ESTCIVIL))+geom_bar()+
+ # scale_y_continuous(name="Cantidad de Personas")+
+  #scale_fill_discrete(name = "Estado CIvil",labels = c("Casado", "soltero", "etc","l","s"))
+```
+
+##sexo
+##Ingresos
+##Extranjero
+##Tipo Documento
+##edad
