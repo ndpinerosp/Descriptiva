@@ -27,23 +27,52 @@ ya que este analisis es interesante
 ```{r}
 load("sisben.RData")
 
-sisben2<- sisben
+sisben2<-sisben
 
-cols<-c("ZONA","COMUNA","VEREDA","BARRIO","VIVIENDA","TELEFONO","PARED","PISO","ENERGIA",
-        "ALCANTA","GAS","BASURA","ACUEDUC","ESTRATO","ELIMBASURA","HOGAR","TENEVIV","USOSANI",
-        "USANITAR","SANITAR","DUCHA","AGUA","LLEGA","SUMINIS","PREPARAN","COCINA","COCINAN",
-        "ALUMBRA","USOTELE","NEVERA","LAVADORA","TVCOLOR","TVCABLE","CALENTA","HORNO","AIRE",
-        "COMPUTADOR","EQUIPO","MOTO","TRACTOR","AUTO1","BIERAICES","SEXO","EXTRANJERO",
-        "TIPODOC","PARENTES","ESTCIVIL","SERDOMES","PAGAPOR","DISCAPA","CARNET","EMBARAZA",
-        "ASISTE","TIPOESTA","NIVEL","ACTIVI","PERCIBE","FORMULARIO") 
+col2<-c("ENERGIA",'TELEFONO','BASURA','ALCANTA','GAS','ACUEDUC','DUCHA','NEVERA','LAVADORA',
+        'TVCOLOR','TVCABLE','CALENTA','HORNO','AIRE','COMPUTADOR','EQUIPO','MOTO','TRACTOR',
+        'AUTO1','BIERAICES','EXTRANJERO','SERDOMES','PAGAPOR','EMBARAZA','ASISTE','PERCIBE')
+sisben2[col2] <- lapply(sisben2[col2], factor,labels=c('Si','NO'))
+
+cols<-c("COMUNA","VEREDA","BARRIO","FORMULARIO","DEPTO","MUNIC") 
 sisben2[cols] <- lapply(sisben2[cols], factor)
 sisben2$FECHANTO<- as.Date(sisben2$FECHANTO,"%d/%m/%Y")
 sisben2$INGRESOS<- as.numeric(sisben2$INGRESOS)
-sisben2$EDAD <- as.numeric(difftime(Sys.Date(), 
-                          sisben2$FECHANTO, 
-                          units = "days"))/365.25
-str(sisben2)
+sisben2$EDAD <- as.numeric(difftime(as.Date("2017-12-01"), 
+                                    sisben2$FECHANTO, 
+                                    units = "days"))/365.25
 
+sisben2$ZONA<-factor(sisben2$ZONA,labels=c('Cabecera','Centro Poblado','Rural Disperso'))
+sisben2$VIVIENDA<-factor(sisben2$VIVIENDA,labels=c('Casa o Apto','Cuarto','Otro Tipo de unidad','Casa Indigena'))
+sisben2$PARED<-factor(sisben2$PARED,labels=c('Sin Paredes','Bloque,Ladrillo,Piedra','Tapia pisada, Adobe','Bahareque','Material Prefabricado','Madera Burda,tabla,tablon','Guadua,Caña,otro vegetal','Zinc,tela,desechos'))
+sisben2$PISO<-factor(sisben2$PISO,labels=c('Alfombra o tapete,Marmol,Madera pulida','Baldosa,Vinilo,tableta','Cemento o gravilla','Madera burda,tabla o tablon','Tierra o arena','Otro'))
+sisben2$ELIMBASURA<-factor(sisben2$ELIMBASURA,labels=c('La recogen los servicios de aseo','La entierran','La queman','La tiran al patio, lote, zanja o baldío','La tiran al río, caño, quebrada, laguna ','La eliminan de otra forma'))
+
+sisben2$TENEVIV<-factor(sisben2$TENEVIV,labels=c('Arriendo','Propia pagando','Propia pagada','Otra condición'))
+sisben2$USOSANI<-factor(sisben2$USOSANI,labels=c('0','Uso exclusivo del hogar', 'Compartido con otros hogares'))
+sisben2$USANITAR<-factor(sisben2$USANITAR,labels=c('0','Dentro de la unidad de vivienda','Fuera de la unidad de vivienda'))
+sisben2$SANITAR<-factor(sisben2$SANITAR,labels=c('No tiene','Inodoro con conexión a alcantarillado','Inodoro con conexión a pozo séptico','Inodoro sin conexión a alcantarillado ni a pozo séptico' , 'Letrina, bajamar' ))
+sisben2$AGUA<-factor(sisben2$AGUA,labels=c('Acueducto','Pozo con bomba','Pozo sin bomba, jagüey','Agua lluvia','Río, quebrada, manantial, nacimiento','Pila pública','Carrotanque','Aguatero','Donación'))
+
+sisben2$LLEGA<-factor(sisben2$LLEGA,labels=c('0','Si','No')) #pregunta que hacer con el 0 si es de si o no
+sisben2$SUMINIS<-factor(sisben2$SUMINIS,labels=c('0','Si','No'))
+sisben2$PREPARAN<-factor(sisben2$PREPARAN,labels=c('No tiene cocina','En un espacio exclusivo para cocinar','En un espacio NO exclusivo para cocinar'))
+sisben2$COCINA<-factor(sisben2$COCINA,labels=c('0','Uso exclusivo del hogar', 'Compartido con otros hogares'))
+sisben2$COCINAN<-factor(sisben2$COCINAN,labels=c('Ninguno','Electricidad','Gas natural domiciliario','Gas propano','Kerosene, petróleo, gasolina, cocinol, alcohol','Carbón mineral' ,'Material de desecho, leña, carbón de leña' ))
+sisben2$ALUMBRA<-factor(sisben2$ALUMBRA,labels=c('Ninguno','Eléctrico','Solar, bioenergía, otros','Kerosene, petróleo, gasolina','Vela'))
+sisben2$USOTELE<-factor(sisben2$USOTELE,labels=c( 'No tiene','De uso exclusivo del hogar','Compartido con otros hogares'))
+sisben2$SEXO<-factor(sisben2$SEXO,labels=c('Hombre','Mujer'))
+sisben2$TIPODOC<-factor(sisben2$TIPODOC,labels=c('No tiene','Cédula de Ciudadanía','Tarjeta de Identidad','Cédula de Extranjería','Registro Civil'))
+sisben2$PARENTES<-factor(sisben2$PARENTES,labels=c('Jefe','Cónyuge o compañera(o)','Hijos','Nietos','Padres','Hermanos','Yerno o nuera','Abuelos','Suegros','Tíos','Sobrinos','Primos','Cuñados','Otros parientes','No parientes','Servicio doméstico o cuidandero','Pariente servicio doméstico o cuidandero'))
+sisben2$ESTCIVIL<-factor(sisben2$ESTCIVIL,labels=c('Unión libre','Casado','Viudo','Separado o divorciado','Soltero'))
+sisben2$DISCAPA<-factor(sisben2$DISCAPA,labels=c('Ninguna', 'Ceguera total','Sordera total','Mudez','Dificultad para moverse o caminar por sí mismo','Dificultad para bañarse, vestirse, alimentarse por sí mismo','Dificultad para salir a la calle sin ayuda o compañía', 'Dificultad para entender o aprender'))
+sisben2$CARNET<-factor(sisben2$CARNET,labels=c('Ninguna','Instituto de Seguros Sociales(ISS)','Regímenes especiales(RE)','EPS Contributiva DISTINTA ISS o RE','EPS subsidiada '))
+sisben2$TIPOESTA<-factor(sisben2$TIPOESTA,labels=c('Ninguno','Centros de atención u hogares ICBF','Guardería, salacuna, preescolar, jardín infantil público','Guardería, salacuna, preescolar, jardín infantil privado','Escuela, colegio, técnico universitario o universidad pública ','Escuela, colegio, técnico universitario o universidad privada','SENA', 'Secundaria técnica pública','Secundaria técnica privada'))
+sisben2$NIVEL<-factor(sisben2$NIVEL,labels=c('Ninguno','Primaria','Secundaria','Técnica o tecnológica','Universidad','Postgrado'))
+sisben2$ACTIVI<-factor(sisben2$ACTIVI,labels=c('Sin actividad','Trabajando','Buscando trabajo' ,'Estudiando','Oficios del hogar','Rentista','Jubilado, pensionado','Inválido'))
+
+summary(sisben2$ACTIVI)
+str(sisben2)
 ```
 
 ##Descripción de variables por persona
@@ -61,8 +90,8 @@ Teniendo la siguiente numeración para los estados civiles:
 veamos cuál de estos es mas común entre los encuestados:
 ```{r}
 s1 <- sisben2 %>%
-             arrange(desc(ESTCIVIL))%>%
-                  droplevels()
+  arrange(desc(ESTCIVIL))%>%
+  droplevels()
 tabla1 <- sort(table(s1$ESTCIVIL),decreasing = TRUE)
 
 s1$ESTCIVIL<- factor(s1$ESTCIVIL,levels = names(tabla1))
@@ -80,8 +109,8 @@ En la siguiente tabla podemos ver la frecuencia de cada genero entre todos los e
 
 ```{r}
 s1 <- s1 %>%
-        arrange(desc(SEXO))%>%
-          droplevels()
+  arrange(desc(SEXO))%>%
+  droplevels()
 tabla1<-sort(table(s1$SEXO), decreasing = TRUE)
 
 s1$SEXO= factor(s1$SEXO, levels = names(tabla1))
@@ -97,8 +126,8 @@ ahora veamos cuantas personas se encuentran en estado de embarazo o han tenido h
 
 ```{r}
 s1 <- s1 %>%
-        arrange(desc(EMBARAZA))%>%
-          droplevels()
+  arrange(desc(EMBARAZA))%>%
+  droplevels()
 tabla1<-sort(table(s1$EMBARAZA), decreasing = TRUE)
 
 s1$EMBARAZA= factor(s1$EMBARAZA, levels = names(tabla1))
@@ -121,8 +150,8 @@ Nos interesa saber cuántos de los encuestados sufren de algún tipo de discapac
 
 ```{r}
 s1 <- s1 %>%
-        arrange(desc(DISCAPA))%>%
-          droplevels()
+  arrange(desc(DISCAPA))%>%
+  droplevels()
 tabla1<-sort(table(s1$DISCAPA), decreasing = TRUE)
 
 s1$DISCAPA= factor(s1$DISCAPA, levels = names(tabla1))
@@ -138,8 +167,8 @@ Sabiendo que el jefe del hogar según el Dane es aquel miembro que es reconocido
 
 ```{r}
 s1 <- s1 %>%
-        arrange(desc(PARENTES))%>%
-          droplevels()
+  arrange(desc(PARENTES))%>%
+  droplevels()
 tabla1<-sort(table(s1$PARENTES), decreasing = TRUE)
 
 s1$PARENTES= factor(s1$PARENTES, levels = names(tabla1))
@@ -158,8 +187,8 @@ Queremos saber cuántos de los encuestados son extranjeros residentes en Medell�
 
 ```{r}
 s1 <- s1 %>%
-        arrange(desc(EXTRANJERO))%>%
-          droplevels()
+  arrange(desc(EXTRANJERO))%>%
+  droplevels()
 tabla1<-sort(table(s1$EXTRANJERO), decreasing = TRUE)
 
 s1$EXTRANJERO= factor(s1$EXTRANJERO, levels = names(tabla1))
@@ -178,8 +207,8 @@ Nos interesa ver cuántos de los encuestados están afiliados al sistema de salu
 
 ```{r}
 s1 <- s1 %>%
-        arrange(desc(CARNET))%>%
-          droplevels()
+  arrange(desc(CARNET))%>%
+  droplevels()
 tabla1<-sort(table(s1$CARNET), decreasing = TRUE)
 
 s1$CARNET= factor(s1$CARNET, levels = names(tabla1))
@@ -197,8 +226,8 @@ Esto se puede responder teniendo en cuenta que:
 
 ```{r}
 s1 <- s1 %>%
-        arrange(desc(ASISTE))%>%
-          droplevels()
+  arrange(desc(ASISTE))%>%
+  droplevels()
 tabla1<-sort(table(s1$ASISTE), decreasing = TRUE)
 
 s1$ASISTE= factor(s1$ASISTE, levels = names(tabla1))
@@ -209,22 +238,11 @@ Podemos observar que gran parte de los encuestados no asisten a centros educativ
 ###Tipo de establecimiento educativo
 ¿A qué tipo de establecimiento educativo asisten los encuestados?
 
-Para responder esta pregunta, hay que tener en cuenta la siguiente numeración:
-
-1. Centros de atención u hogares ICBF 
-2. Guardería, salacuna, preescolar, jardín infantil público 
-3. Guardería, salacuna, preescolar, jardín infantil privado 
-4. Escuela, colegio, técnico universitario o universidad pública 
-5. Escuela, colegio, técnico universitario o universidad privada 
-6. SENA 
-7. Secundaria técnica pública 
-8. Secundaria técnica privada 
-0. Ninguno
 
 ```{r}
 s1 <- s1 %>%
-        arrange(desc(TIPOESTA))%>%
-          droplevels()
+  arrange(desc(TIPOESTA))%>%
+  droplevels()
 tabla1<-sort(table(s1$TIPOESTA), decreasing = TRUE)
 
 s1$TIPOESTA= factor(s1$TIPOESTA, levels = names(tabla1))
@@ -240,8 +258,8 @@ En la siguiente tabla podemos apreciar cómo se distribuyen los encuestados seg�
 
 ```{r}
 s1 <- s1 %>%
-        arrange(desc(GRADO))%>%
-          droplevels()
+  arrange(desc(GRADO))%>%
+  droplevels()
 tabla1<-sort(table(s1$GRADO), decreasing = TRUE)
 
 s1$GRADO= factor(s1$GRADO, levels = names(tabla1))
@@ -263,8 +281,8 @@ Esto puede responderse con la siguiente tabla, teniendo en cuenta que los nivele
 
 ```{r}
 s1 <- s1 %>%
-        arrange(desc(NIVEL))%>%
-          droplevels()
+  arrange(desc(NIVEL))%>%
+  droplevels()
 tabla1<-sort(table(s1$NIVEL), decreasing = TRUE)
 
 s1$NIVEL= factor(s1$NIVEL, levels = names(tabla1))
@@ -287,8 +305,8 @@ La siguiente tabla nos indica las actividades a las que se han dedicado los encu
 
 ```{r}
 s1 <- s1 %>%
-        arrange(desc(ACTIVI))%>%
-          droplevels()
+  arrange(desc(ACTIVI))%>%
+  droplevels()
 tabla1<-sort(table(s1$ACTIVI), decreasing = TRUE)
 
 s1$ACTIVI= factor(s1$ACTIVI, levels = names(tabla1))
@@ -312,8 +330,8 @@ Nos interesa conocer, cuáles de los encuestados perciben ingresos de algún tip
 
 ```{r}
 s1 <- s1 %>%
-        arrange(desc(PERCIBE))%>%
-          droplevels()
+  arrange(desc(PERCIBE))%>%
+  droplevels()
 tabla1<-sort(table(s1$PERCIBE), decreasing = TRUE)
 
 s1$PERCIBE= factor(s1$PERCIBE, levels = names(tabla1))
@@ -329,8 +347,8 @@ También es interesante conocer cuántos de los encuestados pagan a otro miembro
 
 ```{r}
 s1 <- s1 %>%
-        arrange(desc(PAGAPOR))%>%
-          droplevels()
+  arrange(desc(PAGAPOR))%>%
+  droplevels()
 tabla1<-sort(table(s1$PAGAPOR), decreasing = TRUE)
 
 s1$PAGAPOR= factor(s1$PAGAPOR, levels = names(tabla1))
@@ -346,8 +364,8 @@ Es interesante conocer que cantidad de los encuestados trabajan al interior del 
 
 ```{r}
 s1 <- s1 %>%
-        arrange(desc(SERDOMES))%>%
-          droplevels()
+  arrange(desc(SERDOMES))%>%
+  droplevels()
 tabla1<-sort(table(s1$SERDOMES), decreasing = TRUE)
 
 s1$SERDOMES = factor(s1$SERDOMES, levels = names(tabla1))
@@ -366,8 +384,8 @@ Nos interesa conocer el tipo de documento de los encuestados, ya que esto nos po
 
 ```{r}
 s1 <- s1 %>%
-        arrange(desc(TIPODOC))%>%
-          droplevels()
+  arrange(desc(TIPODOC))%>%
+  droplevels()
 tabla1<-sort(table(s1$TIPODOC), decreasing = TRUE)
 
 s1$TIPODOC = factor(s1$TIPODOC, levels = names(tabla1))
@@ -377,3 +395,40 @@ Como podemos observar de la tabla, la mayor parte de la población cuenta con ce
 
 Resulta preocupante que 10.362 no tengan documento, esto podría ser un indicio de que existe una alta cantidad de inmigrantes ilegales, también podemos notar que 2.636 cuentan con cédula de extranjería lo cual nos dice que hay una buena cantidad de extranjeros residentes en la ciudad.
 
+###Edad
+
+Nos interesa saber como se distribuyen las edades de las personas encuestadas lo cual se puede apreciar en la siguiente grafica:
+
+```{r}
+ggplot(sisben2,aes(EDAD))+geom_freqpoly(bins = 30)+ylab("Cantidad de Personas")+scale_x_continuous(breaks=seq(0,120,10))+scale_y_continuous(breaks=seq(0,180000,20000))+ggtitle("Distribucion de EDAD")
+```
+
+Con este Grafico podemos Observar que la edad mas frecuente de la ´poblacion esta entre los 20 y 25 años de edad cumplidos al dia de realizar la encuesta, mientras que es muy poca la cantidad de personas que viven mas de 90 años,como se puede apreciar, tambien notamos que hay una persona que al parecer tiene una edad de 120 años , este caso puede llegar a ser posible en la poblacion pero no es muy frecuente.
+Tambien se puede notar una pequeña anomalia en el comportamiento de la distribucion, entre las personas que tienen entre 45 y 55 años ya que iba en caida la cantidad de personas y aumento un poco. 
+
+### Buscando Empleo
+
+Queremos observar cual es la cantidad de semanas llevan las personas buscando un empleo, y lo podemos mostrar con el siguienete resumen:
+
+```{r}
+summary(sisben2$BUSCANDO)
+sd(sisben2$BUSCANDO)
+
+```
+Podemos notar de este resumen que la mayoria de las personas no se encuentran buscando empleo, aunque las pocas que buscan empleo ha llegado a un maximo de 52 semanasa buscandolo hasta la fecha de la encuesta, y dado que la mayoria de las personas no estan buscando empleo y hay algunos otros muy lejanos podriamos decir que hay una dispersion considerablemente alta dado que su desviacion estanda es superio a 1.  
+
+###Ingresos 
+
+Nos interesa saber cuales son los ingresos totales mensuales de las personas de acuerdo al siguiente resumen:
+```{r}
+summary(sisben2$INGRESOS)
+```
+Luego podemos notar los 6 mayores ingresos:
+```{r}
+s2<-sisben2 %>%
+    arrange(desc(sisben2$INGRESOS))
+head(s2$INGRESOS)
+
+```
+
+De acuerdo a este resumen podemos notar que almenos el 50% de las personas tiene un ingreso mensual de 0 pesos, lo cual podria indicar que hay una mayor tasa de desempleo, o son personas las cuales no pueden laborar, e inclusive podemos notar que la persona que mas gana tiene un ingreso mesual de 16'000.000 de pesos lo cual es un salario alto en comparacion a la mayoria , y que las 6 personas que mas ganan no ganan menos de 13'000.000 de pesos.
