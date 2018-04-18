@@ -1,0 +1,379 @@
+---
+title: "TG#2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(ggplot2)
+library(dplyr)
+
+```
+
+##categorizar variables
+
+##descripcion de variables
+mostrar un analisis de las variables es decir mostrar distribuciones,etc
+
+##graficas
+mostrar graficas de relaciones relevantes es decir mostrar graficas de "cantida de personas mayores de 18 años por comuna"
+ya que este analisis es interesante
+
+
+```{r}
+load("sisben.RData")
+
+sisben2<- sisben
+
+cols<-c("ZONA","COMUNA","VEREDA","BARRIO","VIVIENDA","TELEFONO","PARED","PISO","ENERGIA",
+        "ALCANTA","GAS","BASURA","ACUEDUC","ESTRATO","ELIMBASURA","HOGAR","TENEVIV","USOSANI",
+        "USANITAR","SANITAR","DUCHA","AGUA","LLEGA","SUMINIS","PREPARAN","COCINA","COCINAN",
+        "ALUMBRA","USOTELE","NEVERA","LAVADORA","TVCOLOR","TVCABLE","CALENTA","HORNO","AIRE",
+        "COMPUTADOR","EQUIPO","MOTO","TRACTOR","AUTO1","BIERAICES","SEXO","EXTRANJERO",
+        "TIPODOC","PARENTES","ESTCIVIL","SERDOMES","PAGAPOR","DISCAPA","CARNET","EMBARAZA",
+        "ASISTE","TIPOESTA","NIVEL","ACTIVI","PERCIBE","FORMULARIO") 
+sisben2[cols] <- lapply(sisben2[cols], factor)
+sisben2$FECHANTO<- as.Date(sisben2$FECHANTO,"%d/%m/%Y")
+sisben2$INGRESOS<- as.numeric(sisben2$INGRESOS)
+sisben2$EDAD <- as.numeric(difftime(Sys.Date(), 
+                          sisben2$FECHANTO, 
+                          units = "days"))/365.25
+str(sisben2)
+
+```
+
+##Descripción de variables por persona
+
+
+###Estado Civil
+Teniendo la siguiente numeración para los estados civiles:
+
+1. Unión libre
+2. Casado
+3. Viudo
+4. Separado
+5. Soltero
+
+veamos cuál de estos es mas común entre los encuestados:
+```{r}
+s1 <- sisben2 %>%
+             arrange(desc(ESTCIVIL))%>%
+                  droplevels()
+tabla1 <- sort(table(s1$ESTCIVIL),decreasing = TRUE)
+
+s1$ESTCIVIL<- factor(s1$ESTCIVIL,levels = names(tabla1))
+summary(s1$ESTCIVIL)
+```
+Como vemos el estado civil más común es el número 5, con lo cual podemos afirmar que la mayor parte de los encuestados son solteros, seguido "2:personas" casadas, el cual tiene un valor muy cercano a "1:unión libre". 
+
+###Sexo
+Nos interesa saber cuál es el sexo que tiene más frecuencia entre los encuestado, teniendo en cuenta que:
+
+1. Corresponde a hombre
+2. Corresponde a mujer
+
+En la siguiente tabla podemos ver la frecuencia de cada genero entre todos los encuestados:
+
+```{r}
+s1 <- s1 %>%
+        arrange(desc(SEXO))%>%
+          droplevels()
+tabla1<-sort(table(s1$SEXO), decreasing = TRUE)
+
+s1$SEXO= factor(s1$SEXO, levels = names(tabla1))
+summary((s1$SEXO))
+```
+Como vemos, el sexo que tiene mayor frecuencia entre los encuestados es el numero 2 correspondiente a "Mujer".
+
+###Embarazada o ha tenido hijos
+ahora veamos cuantas personas se encuentran en estado de embarazo o han tenido hijos, teniendo en cuenta que:
+
+1. Corresponde a "Si"
+2. Corresponde a "No"
+
+```{r}
+s1 <- s1 %>%
+        arrange(desc(EMBARAZA))%>%
+          droplevels()
+tabla1<-sort(table(s1$EMBARAZA), decreasing = TRUE)
+
+s1$EMBARAZA= factor(s1$EMBARAZA, levels = names(tabla1))
+summary(s1$EMBARAZA)
+
+```
+De lo anterior podemos afirmar que la gran mayoría de las personas no se encuentran en estado de embarazo y no han tenido hijos.
+
+###Discapacidad
+Nos interesa saber cuántos de los encuestados sufren de algún tipo de discapacidad, estas están catalogadas como así:
+
+1. Ceguera total
+2. Sordera total
+3. Mudez
+4. Dificultad para moverse o caminar por sí mismo
+5. Dificultad para bañarse, vestirse, alimentarse por sí mismo
+6. Dificultad para salir a la calle sin ayuda o compañía
+7. Dificultad para entender o aprender
+0. Ninguna
+
+```{r}
+s1 <- s1 %>%
+        arrange(desc(DISCAPA))%>%
+          droplevels()
+tabla1<-sort(table(s1$DISCAPA), decreasing = TRUE)
+
+s1$DISCAPA= factor(s1$DISCAPA, levels = names(tabla1))
+summary(s1$DISCAPA)
+
+```
+De la tabla anterior se puede afirmar que la mayor parte de los encuestados no presenta alguna discapacidad, pero la más frecuente es la numero 7 correspondiente a dificultad para entender o aprender.
+
+###Parentesco con el jefe del hogar
+Sabiendo que el jefe del hogar según el Dane es aquel miembro que es reconocido como "jefe" por los demás miembros del hogar, observemos cual o cuales son los parentescos más comunes con este, teniendo en cuenta la siguiente numeración para cada uno:
+
+1: Jefe - 2: Conyugue o compañera(o) - 3: Hijos - 4: Nietos - 5: padres - 6: Hermanos - 7: Yerno o nuera - 8: Abuelos - 9: Suegros - 10: Tíos - 11: Sobrinos - 12: Primos - 13: Cuñados - 14: Otros parientes - 15: No parientes - 16: Servicio doméstico o cuidandero - 17: Pariente servicio doméstico o cuidandero
+
+```{r}
+s1 <- s1 %>%
+        arrange(desc(PARENTES))%>%
+          droplevels()
+tabla1<-sort(table(s1$PARENTES), decreasing = TRUE)
+
+s1$PARENTES= factor(s1$PARENTES, levels = names(tabla1))
+summary(s1$PARENTES)
+```
+Con los datos obtenidos en la tabla, podemos observar que el parentesco más común con el jefe del hogar es el 3 correspondiente a hijos, seguido del 1 que corresponde al mismo jefe de hogar; en tercer lugar, se encuentra el número 2 que hace referencia al cónyuge o compañera(o).
+
+También, de los últimos tres lugares podemos notar que pocos viven con sus abuelos, muy pocos tienen servicio doméstico residente en el hogar y una minoría vive con parientes del servicio doméstico.
+
+
+###Extranjero
+Queremos saber cuántos de los encuestados son extranjeros residentes en Medellín, esto se ilustra a en la siguiente tabla, teniendo en cuenta que:
+
+1. Corresponde a las personas extranjeras
+2. Corresponde a los que no son extranjeros
+
+```{r}
+s1 <- s1 %>%
+        arrange(desc(EXTRANJERO))%>%
+          droplevels()
+tabla1<-sort(table(s1$EXTRANJERO), decreasing = TRUE)
+
+s1$EXTRANJERO= factor(s1$EXTRANJERO, levels = names(tabla1))
+summary(s1$EXTRANJERO)
+```
+Viendo los datos de la tabla anterior podemos afirmar que la gran mayoría de los encuestados no son extranjeros.
+
+###Carnet
+Nos interesa ver cuántos de los encuestados están afiliados al sistema de salud y cuál es el tipo de afiliación, para ello se tienen en cuenta los siguientes datos:
+
+1. Instituto de Seguros Sociales - ISS - (Nueva EPS) 
+2. Regímenes especiales (Fuerzas Militares, Policía Nacional, Universidad Nacional, Ecopetrol, Magisterio) 
+3. EPS Contributiva DISTINTA a 1 ó 2 
+4. EPS subsidiada (ARS - Administradora de Régimen Subsidiado) 
+0. Ninguna
+
+```{r}
+s1 <- s1 %>%
+        arrange(desc(CARNET))%>%
+          droplevels()
+tabla1<-sort(table(s1$CARNET), decreasing = TRUE)
+
+s1$CARNET= factor(s1$CARNET, levels = names(tabla1))
+summary(s1$CARNET)
+```
+Como vemos, la mayor parte de los encuestados se encuentran en 3 correspondiente a "EPS Contributiva DISTINTA a 1 ó 2", también podemos notar algo muy preocupante, que 595.661 de los encuestados no se encuentran en ningún sistema de salud, lo cual se puede apreciar en el índice 0 de la tabla.
+
+###Asistencia a centros educativos
+¿Cuántos de los encuestados asisten a algún centro educativo?
+
+Esto se puede responder teniendo en cuenta que:
+
+1. Corresponde a las personas que asisten a algún centro educativo.
+2. Corresponde a las personas que no asisten a centros educativos.
+
+```{r}
+s1 <- s1 %>%
+        arrange(desc(ASISTE))%>%
+          droplevels()
+tabla1<-sort(table(s1$ASISTE), decreasing = TRUE)
+
+s1$ASISTE= factor(s1$ASISTE, levels = names(tabla1))
+summary(s1$ASISTE)
+```
+Podemos observar que gran parte de los encuestados no asisten a centros educativos y 570.719 si asisten, esto puede deberse a que gran parte de la población es adulta y se dedica a actividades laborales en lugar de académicas.
+
+###Tipo de establecimiento educativo
+¿A qué tipo de establecimiento educativo asisten los encuestados?
+
+Para responder esta pregunta, hay que tener en cuenta la siguiente numeración:
+
+1. Centros de atención u hogares ICBF 
+2. Guardería, salacuna, preescolar, jardín infantil público 
+3. Guardería, salacuna, preescolar, jardín infantil privado 
+4. Escuela, colegio, técnico universitario o universidad pública 
+5. Escuela, colegio, técnico universitario o universidad privada 
+6. SENA 
+7. Secundaria técnica pública 
+8. Secundaria técnica privada 
+0. Ninguno
+
+```{r}
+s1 <- s1 %>%
+        arrange(desc(TIPOESTA))%>%
+          droplevels()
+tabla1<-sort(table(s1$TIPOESTA), decreasing = TRUE)
+
+s1$TIPOESTA= factor(s1$TIPOESTA, levels = names(tabla1))
+summary(s1$TIPOESTA)
+```
+Como podemos observar, 1.372.912 de los encuestados no asiste a centros educativos, dato el cual se obtuvo también en el análisis de "Asistencia a centros educativos"; de los que si asisten, la mayoría se encuentran en "4. Escuela, colegio, técnico universitario o universidad pública", seguido de "2. Guardería, salacuna, preescolar, jardín infantil público ", con lo cual se puede notar que la mayoría de estos son una población joven que hace uso de la educación pública.
+
+Se puede notar además que los menos frecuentes son aquellos que asisten a secundarias técnicas, siendo el menos frecuente "8. Secundaria técnica privada " con 49 de los encuestados asistiendo a este tipo de establecimiento.
+
+
+###Grado
+En la siguiente tabla podemos apreciar cómo se distribuyen los encuestados según su ultimo grado académico aprobado.
+
+```{r}
+s1 <- s1 %>%
+        arrange(desc(GRADO))%>%
+          droplevels()
+tabla1<-sort(table(s1$GRADO), decreasing = TRUE)
+
+s1$GRADO= factor(s1$GRADO, levels = names(tabla1))
+summary(s1$GRADO)
+```
+El grado más común es el numero 6 (el cual se asume como el grado máximo), seguido del grado 0 (Asumido como el mínimo), lo cual resulta bastante preocupante ya que esto podría indicar que la población encuestada tiene un bajo nivel educativo o también podría tratarse de una población compuesta en su mayoría por jóvenes que aun están cursando sus estudios.
+
+###Nivel
+¿Cuál es el nivel educativo alcanzado por los encuestados?
+
+Esto puede responderse con la siguiente tabla, teniendo en cuenta que los niveles están numerados de la siguiente manera:
+
+1. Primaria 
+2. Secundaria 
+3. Técnica o tecnológica
+4. Universidad 
+5. Postgrado 
+0. Ninguno
+
+```{r}
+s1 <- s1 %>%
+        arrange(desc(NIVEL))%>%
+          droplevels()
+tabla1<-sort(table(s1$NIVEL), decreasing = TRUE)
+
+s1$NIVEL= factor(s1$NIVEL, levels = names(tabla1))
+summary(s1$NIVEL)
+```
+El nivel educativo más frecuente es el secundario, lo cual nos indica que la mayor parte de los encuestados han alcanzado un nivel educativo aceptable, lo cual que podría deberse a que la población encuestada es joven o trabajadora.
+Resulta preocupante que en segundo lugar se encuentre "1. Primaria" con 581.722 y en tercer lugar “0. Ninguno" 351.712, ya que son números muy altos para estos niveles educativos, esto al igual que en el análisis de "Grado" puede deberse a una población encuestada compuesta por muchos jóvenes o a que hay un nivel educativo bajo.
+
+###Actividad
+La siguiente tabla nos indica las actividades a las que se han dedicado los encuestados en el ultimo mes al dia de la encuesta, teniendo en cuenta que las actividades estan numeradas de la siguiente manera:
+
+0. Trabajando
+1. Sin actividad 
+2. Buscando trabajo 
+3. Estudiando 
+4. Oficios del hogar 
+5. Rentista 
+6. Jubilado o pensionado 
+7. Inválido
+
+```{r}
+s1 <- s1 %>%
+        arrange(desc(ACTIVI))%>%
+          droplevels()
+tabla1<-sort(table(s1$ACTIVI), decreasing = TRUE)
+
+s1$ACTIVI= factor(s1$ACTIVI, levels = names(tabla1))
+summary(s1$ACTIVI)
+
+#Aqui en la tabla aparece un valor 0, el cual no esta en el diccionario de datos ni en la decripcion de los datos, por lo tanto no se como tratar ese dato.
+
+#Actualización: el profesor dijo que trataramos ese 0 como "sin actividad" y el 1 como "trabajando""
+```
+cómo podemos observar la actividad más frecuente es "1. Trabajando", lo cual nos indica que una buena parte de la población se dedica a trabajar, por otro lado, es preocupante que 350.133 se encuentren sin actividad, eso en conjunto con el análisis de "Sexo" en el cual vimos que había un mayor número de mujeres, puede ser un indicativo que nos muestre una cantidad alta de mujeres dedicadas a ser amas de casa.
+
+También es importante notar que en segundo lugar se encuentra "3. Estudiando ", lo cual respalda la hipótesis de que en la población existen muchos jóvenes.
+
+Algo también a tener en cuenta es que la actividad menos frecuente es "Invalido", esto nos dice que en su mayoría se trata de una población "sana".
+
+###Percibe ingresos
+Nos interesa conocer, cuáles de los encuestados perciben ingresos de algún tipo (laborales, arriendos, subsidios, transferencias, etc.) para ello tengamos en cuenta lo siguiente:
+
+1. Corresponde a las personas que perciben ingresos de algún tipo
+2. Corresponde a las personas que no perciben ingresos
+
+```{r}
+s1 <- s1 %>%
+        arrange(desc(PERCIBE))%>%
+          droplevels()
+tabla1<-sort(table(s1$PERCIBE), decreasing = TRUE)
+
+s1$PERCIBE= factor(s1$PERCIBE, levels = names(tabla1))
+summary(s1$PERCIBE)
+```
+Como podemos observar gran cantidad de los encuestados están catalogados en "2. corresponde a las personas que no perciben ingresos", como vimos anteriormente esto puede deberse a una población joven que se dedica actividades académicas, pero al ser un número tan alto también puede respaldar la hipótesis de una alta tasa de desempleo.
+
+###Paga a otro miembro del hogar
+También es interesante conocer cuántos de los encuestados pagan a otro miembro del hogar por arriendo y alimentación, lo cual esta consignado en la siguiente tabla, teniendo en cuenta que:
+
+1. Es el número de encuestados que pagan a otro miembro arriendo o alimentación
+2. Es el número de encuestados que no pagan a otro miembro por arriendo o alimentación
+
+```{r}
+s1 <- s1 %>%
+        arrange(desc(PAGAPOR))%>%
+          droplevels()
+tabla1<-sort(table(s1$PAGAPOR), decreasing = TRUE)
+
+s1$PAGAPOR= factor(s1$PAGAPOR, levels = names(tabla1))
+summary(s1$PAGAPOR)
+```
+De los datos consignados en la tabla podemos afirmar que la gran mayoría de la población no pagan por los servicios mencionados anteriormente y 2.128 encuestados si pagan, esto podría deberse a hogares que arriendan habitaciones a estudiantes u hogares que para mejorar sus ingresos destinan habitaciones para arrendar a cualquier inquilino que cuente con los ingresos suficientes para pagar.
+
+###Servicio doméstico
+Es interesante conocer que cantidad de los encuestados trabajan al interior del hogar en modalidad de servicio doméstico o cuidandero, para ello veamos como están agrupados, teniendo en cuenta lo siguiente:
+
+1. Corresponde a las personas que trabajan al interior del hogar en alguna de los oficios mencionados
+2. Corresponde a los que no aplican
+
+```{r}
+s1 <- s1 %>%
+        arrange(desc(SERDOMES))%>%
+          droplevels()
+tabla1<-sort(table(s1$SERDOMES), decreasing = TRUE)
+
+s1$SERDOMES = factor(s1$SERDOMES, levels = names(tabla1))
+summary(s1$SERDOMES)
+```
+Los datos que vemos en la tabla nos indican que solo 578 personas encuestadas trabajan al interior del hogar como servicio doméstico o cuidandero, eso nos indica que la población encuestada no tiene una cantidad de ingresos muy alta, ya que no cuentan con la capacidad de pagar por este tipo de servicios, también podría indicarnos que son personas que cuentan con muchos jóvenes-adultos en el hogar y no tienen la necesidad de adquirir este tipo de servicios; estas dos hipótesis podrían ser respaldas por la de alta tasa de desempleo.
+
+###Tipo de documento
+Nos interesa conocer el tipo de documento de los encuestados, ya que esto nos podría indicar que tan joven es la población, para ello tengamos en cuenta la siguiente numeración:
+
+0. No tiene 
+1. Cédula de Ciudadanía 
+2. Tarjeta de Identidad 
+3. Cédula de Extranjería 
+4. Registro Civil
+
+```{r}
+s1 <- s1 %>%
+        arrange(desc(TIPODOC))%>%
+          droplevels()
+tabla1<-sort(table(s1$TIPODOC), decreasing = TRUE)
+
+s1$TIPODOC = factor(s1$TIPODOC, levels = names(tabla1))
+summary(s1$TIPODOC)
+```
+Como podemos observar de la tabla, la mayor parte de la población cuenta con cedula de ciudadanía, por lo tanto, podemos afirmar que esta se encuentra compuesta en su mayoría por jóvenes-adultos y adultos, en segundo lugar, se encuentran aquellos que cuentan con tarjeta de identidad, indicándonos que hay una buena cantidad de niños y adolescentes.
+
+Resulta preocupante que 10.362 no tengan documento, esto podría ser un indicio de que existe una alta cantidad de inmigrantes ilegales, también podemos notar que 2.636 cuentan con cédula de extranjería lo cual nos dice que hay una buena cantidad de extranjeros residentes en la ciudad.
+
